@@ -1,10 +1,31 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 # Create your models here.
 class Booking(models.Model):
+
+    TIMESLOT_LIST = (
+        (1, '18:00'),
+        (2, '18:30'),
+        (3, '19:00'),
+        (4, '19:30'),
+        (5, '20:00'),
+        (6, '20:30'),
+        (7, '21:00'),
+        (8, '21:30'),
+        (8, '22:00'),
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name=_('User name'),
+        related_name='bookings',
+        blank=True, null=True,
+    )
 
     forename = models.CharField(
         verbose_name=_('First name'),
@@ -29,25 +50,36 @@ class Booking(models.Model):
         blank=True,
     )
 
-    date_until = models.DateTimeField(
+    date_until = models.DateField(
         verbose_name=_('Booking date'),
         blank=True, null=True,
     )
 
+    timeslot = models.IntegerField(
+        default=0,
+        choices=TIMESLOT_LIST)
+
     creation_date = models.DateTimeField(
         verbose_name=_('Creation date'),
         auto_now_add=True,
-    )
+    )  
 
-    booking_id = models.CharField(
-        max_length=100,
-        verbose_name=_('Booking ID'),
-        blank=True,
-    )
+    total_guests = models.IntegerField(
+        verbose_name=('No. Of Guests(Max = 12)'),
+        default=1,
+        validators=[
+            MaxValueValidator(12),
+            MinValueValidator(1)
+        ],
+        blank=True, null=True,
+    )     
 
     class Meta:
         ordering = ['-creation_date']
 
+    # def __str__(self):
+    #     return '#{} ({})'.format(self.user or self.pk,
+    #                              self.creation_date)
+
     def __str__(self):
-        return '#{} ({})'.format(self.booking_id or self.pk,
-                                 self.creation_date)
+        return (str(self.user))
