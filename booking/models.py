@@ -56,6 +56,7 @@ class Booking(models.Model):
     )
 
     timeslot = models.IntegerField(
+        verbose_name=_('Booking time'),
         default=0,
         choices=TIMESLOT_LIST)
 
